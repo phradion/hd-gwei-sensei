@@ -11,14 +11,14 @@
     "README.md",
     "LICENSE"
   ],
-"scripts": {
+  "scripts": {
     "build": "tsc && mkdir -p dist/models && cpx \"models/*.py\" dist/models && cpx \"models/requirements.txt\" dist/models",
     "watch": "tsc --watch",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,md}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,md}\"",
     "prepare": "npm run build",
     "postinstall": "git submodule update --init --recursive"
-},
+  },
   "keywords": [
     "ethereum",
     "gas",
@@ -30,9 +30,16 @@
     "node": ">=16.0.0"
   },
   "devDependencies": {
-    "typescript": "^5.7.2",
     "@types/node": "^22.10.2",
+    "commitizen": "^4.3.1",
     "cpx": "^1.5.0",
-    "prettier": "^3.2.5"
+    "cz-conventional-changelog": "^3.3.0",
+    "prettier": "^3.2.5",
+    "typescript": "^5.7.2"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
