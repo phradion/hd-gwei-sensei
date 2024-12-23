@@ -54,4 +54,57 @@ describe('NativeRpcProvider', () => {
       unit: SUPPORTED_CHAINS[chainId].feeUnit,
     });
   });
+
+  test('getCurrentFee should handle zero base fee', async () => {
+    const mockBlockResponse = {
+      result: {
+        baseFeePerGas: '0x0',
+      },
+    };
+
+    const mockGasPriceResponse = {
+      result: '0x2540BE400', // 10 gwei
+    };
+
+    mockedFetch
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockBlockResponse,
+      } as any)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockGasPriceResponse,
+      } as any);
+
+    const result = await provider.getCurrentFee();
+
+    expect(result).toEqual({
+      baseFee: BigInt('0'),
+      priorityFee: BigInt('10000000000'),
+      timestamp: expect.any(Number),
+      confidence: 'medium',
+      unit: SUPPORTED_CHAINS[chainId].feeUnit,
+    });
+  });
+
+  test('getCurrentFee should handle RPC errors', async () => {
+    mockedFetch
+      .mockResolvedValueOnce({
+        ok: false,
+        statusText: 'Service Unavailable',
+        json: async () => ({ error: { message: 'Service Unavailable' } }),
+      } as any)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ result: '0x0' }),
+      } as any);
+
+    await expect(provider.getCurrentFee()).rejects.toThrow('RPC error: Service Unavailable');
+  });
+
+  test('getHistoricalFees should throw not implemented error', async () => {
+    await expect(provider.getHistoricalFees(new Date(), new Date())).rejects.toThrow(
+      'Historical data not implemented for native RPC'
+    );
+  });
 });
